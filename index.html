@@ -12,18 +12,18 @@ body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#e2e8f0}
 .step{display:none;animation:fadeIn .4s ease}.step.active{display:block}
 @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 .ind-card{border:2px solid #1e293b;border-radius:12px;padding:1.25rem;cursor:pointer;transition:all .2s;text-align:center}
-.ind-card:hover{border-color:#6366f1;background:#1e1b4b}
-.ind-card.selected{border-color:#818cf8;background:#1e1b4b;box-shadow:0 0 20px rgba(99,102,241,.25)}
+.ind-card:hover{border-color:#eab308;background:#1e1b4b}
+.ind-card.selected{border-color:#facc15;background:#1e1b4b;box-shadow:0 0 20px rgba(234,179,8,.25)}
 .task-chip{border:1.5px solid #334155;border-radius:8px;padding:.5rem 1rem;cursor:pointer;transition:all .2s;font-size:.875rem}
-.task-chip:hover{border-color:#6366f1}.task-chip.selected{border-color:#818cf8;background:#312e81;color:#c7d2fe}
-.btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:.75rem 2rem;border-radius:10px;font-weight:600;transition:all .2s}
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(99,102,241,.4)}
+.task-chip:hover{border-color:#eab308}.task-chip.selected{border-color:#facc15;background:#312e81;color:#c7d2fe}
+.btn-primary{background:linear-gradient(135deg,#eab308,#eab308);padding:.75rem 2rem;border-radius:10px;font-weight:600;transition:all .2s}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(234,179,8,.4)}
 .btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
 input,select{background:#1e293b;border:1.5px solid #334155;border-radius:8px;padding:.625rem 1rem;color:#e2e8f0;width:100%;transition:border .2s}
-input:focus,select:focus{outline:none;border-color:#6366f1}
+input:focus,select:focus{outline:none;border-color:#eab308}
 .progress-seg{height:4px;border-radius:2px;transition:background .3s}
 .upsell-card{border:1.5px solid #334155;border-radius:12px;padding:1.5rem;transition:all .2s}
-.upsell-card:hover{border-color:#6366f1;background:#0f172a}
+.upsell-card:hover{border-color:#eab308;background:#0f172a}
 </style>
 </head>
 <body class="min-h-screen">
@@ -44,13 +44,13 @@ input:focus,select:focus{outline:none;border-color:#6366f1}
 <div class="max-w-3xl mx-auto px-4 py-8">
 <!-- Header -->
 <div class="text-center mb-8">
-<div class="text-2xl font-bold mb-1">⚡ <span class="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">AfrexAI</span></div>
+<div class="text-2xl font-bold mb-1">⚡ <span class="bg-gradient-to-r from-yellow-400 to-yellow-400 bg-clip-text text-transparent">AfrexAI</span></div>
 <p class="text-slate-500 text-sm">Agent Setup Wizard</p>
 </div>
 
 <!-- Progress -->
 <div class="flex gap-2 mb-10" id="progress">
-<div class="progress-seg flex-1 bg-indigo-500"></div>
+<div class="progress-seg flex-1 bg-yellow-500"></div>
 <div class="progress-seg flex-1 bg-slate-700"></div>
 <div class="progress-seg flex-1 bg-slate-700"></div>
 <div class="progress-seg flex-1 bg-slate-700"></div>
@@ -165,16 +165,16 @@ input:focus,select:focus{outline:none;border-color:#6366f1}
 <div class="mt-10 bg-slate-900/50 border border-slate-800 rounded-xl p-6">
 <h3 class="font-semibold mb-3">Quick start after download:</h3>
 <ol class="text-slate-400 text-sm space-y-2 list-decimal list-inside">
-<li>Install OpenClaw: <code class="text-indigo-400 bg-slate-800 px-1.5 py-0.5 rounded">npm i -g openclaw</code></li>
-<li>Run <code class="text-indigo-400 bg-slate-800 px-1.5 py-0.5 rounded">openclaw init</code> to create your workspace</li>
+<li>Install OpenClaw: <code class="text-yellow-400 bg-slate-800 px-1.5 py-0.5 rounded">npm i -g openclaw</code></li>
+<li>Run <code class="text-yellow-400 bg-slate-800 px-1.5 py-0.5 rounded">openclaw init</code> to create your workspace</li>
 <li>Drop the downloaded files into your workspace folder</li>
 <li>Add your API key (Anthropic or OpenAI)</li>
-<li>Start your agent: <code class="text-indigo-400 bg-slate-800 px-1.5 py-0.5 rounded">openclaw start</code></li>
+<li>Start your agent: <code class="text-yellow-400 bg-slate-800 px-1.5 py-0.5 rounded">openclaw start</code></li>
 </ol>
 <p class="text-slate-500 text-sm mt-3">Full instructions are in setup-guide.md inside the ZIP.</p>
 </div>
 <div class="flex justify-center mt-8">
-<button class="text-indigo-400 hover:text-indigo-300 transition font-medium" onclick="goTo(5)">See what else we offer →</button>
+<button class="text-yellow-400 hover:text-yellow-300 transition font-medium" onclick="goTo(5)">See what else we offer →</button>
 </div>
 </div>
 
@@ -189,9 +189,9 @@ input:focus,select:focus{outline:none;border-color:#6366f1}
 <h3 class="font-bold text-lg mb-1">📦 <span id="upsellIndustry">Industry</span> Context Pack</h3>
 <p class="text-slate-400 text-sm">Pre-built templates, workflows, prompts, and automation scripts tailored to your industry. Plug in and go.</p>
 </div>
-<span class="text-xl font-bold text-indigo-400 whitespace-nowrap ml-4">$97</span>
+<span class="text-xl font-bold text-yellow-400 whitespace-nowrap ml-4">$97</span>
 </div>
-<a href="https://afrexai-cto.github.io/context-packs/" target="_blank" class="inline-block mt-3 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition">Browse the store →</a>
+<a href="https://afrexai-cto.github.io/context-packs/" target="_blank" class="inline-block mt-3 text-sm font-medium text-yellow-400 hover:text-yellow-300 transition">Browse the store →</a>
 </div>
 <div class="upsell-card">
 <div class="flex items-start justify-between">
@@ -199,9 +199,9 @@ input:focus,select:focus{outline:none;border-color:#6366f1}
 <h3 class="font-bold text-lg mb-1">🛠 Done-For-You Setup</h3>
 <p class="text-slate-400 text-sm">We configure your agent end-to-end. Channels, integrations, context packs, cron jobs — all wired up and tested.</p>
 </div>
-<span class="text-xl font-bold text-indigo-400 whitespace-nowrap ml-4">$500</span>
+<span class="text-xl font-bold text-yellow-400 whitespace-nowrap ml-4">$500</span>
 </div>
-<a href="mailto:ksmolichki@afrexai.com?subject=Done-For-You Agent Setup" class="inline-block mt-3 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition">Get in touch →</a>
+<a href="mailto:ksmolichki@afrexai.com?subject=Done-For-You Agent Setup" class="inline-block mt-3 text-sm font-medium text-yellow-400 hover:text-yellow-300 transition">Get in touch →</a>
 </div>
 <div class="upsell-card">
 <div class="flex items-start justify-between">
@@ -209,9 +209,9 @@ input:focus,select:focus{outline:none;border-color:#6366f1}
 <h3 class="font-bold text-lg mb-1">🚀 Fully Managed Agents</h3>
 <p class="text-slate-400 text-sm">We run your agents for you. Hosting, monitoring, updates, and support. You focus on your business.</p>
 </div>
-<span class="text-xl font-bold text-indigo-400 whitespace-nowrap ml-4">From $1,500/mo</span>
+<span class="text-xl font-bold text-yellow-400 whitespace-nowrap ml-4">From $1,500/mo</span>
 </div>
-<a href="mailto:ksmolichki@afrexai.com?subject=Managed Agent Service Inquiry" class="inline-block mt-3 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition">Talk to us →</a>
+<a href="mailto:ksmolichki@afrexai.com?subject=Managed Agent Service Inquiry" class="inline-block mt-3 text-sm font-medium text-yellow-400 hover:text-yellow-300 transition">Talk to us →</a>
 </div>
 </div>
 <div class="flex justify-center mt-8">
@@ -281,7 +281,7 @@ function goTo(n){
   document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
   document.getElementById('step'+n).classList.add('active');
   document.querySelectorAll('.progress-seg').forEach((s,i)=>{
-    s.className = 'progress-seg flex-1 ' + (i<n?'bg-indigo-500':'bg-slate-700');
+    s.className = 'progress-seg flex-1 ' + (i<n?'bg-yellow-500':'bg-slate-700');
   });
   window.scrollTo({top:0,behavior:'smooth'});
 }
