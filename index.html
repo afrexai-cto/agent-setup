@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Setup — AfrexAI</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+body{font-family:'Inter',sans-serif;background:#0a0a0f;color:#e2e8f0}
+.step{display:none;animation:fadeIn .4s ease}.step.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.ind-card{border:2px solid #1e293b;border-radius:12px;padding:1.25rem;cursor:pointer;transition:all .2s;text-align:center}
+.ind-card:hover{border-color:#6366f1;background:#1e1b4b}
+.ind-card.selected{border-color:#818cf8;background:#1e1b4b;box-shadow:0 0 20px rgba(99,102,241,.25)}
+.task-chip{border:1.5px solid #334155;border-radius:8px;padding:.5rem 1rem;cursor:pointer;transition:all .2s;font-size:.875rem}
+.task-chip:hover{border-color:#6366f1}.task-chip.selected{border-color:#818cf8;background:#312e81;color:#c7d2fe}
+.btn-primary{background:linear-gradient(135deg,#6366f1,#8b5cf6);padding:.75rem 2rem;border-radius:10px;font-weight:600;transition:all .2s}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 4px 20px rgba(99,102,241,.4)}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+input,select{background:#1e293b;border:1.5px solid #334155;border-radius:8px;padding:.625rem 1rem;color:#e2e8f0;width:100%;transition:border .2s}
+input:focus,select:focus{outline:none;border-color:#6366f1}
+.progress-seg{height:4px;border-radius:2px;transition:background .3s}
+.upsell-card{border:1.5px solid #334155;border-radius:12px;padding:1.5rem;transition:all .2s}
+.upsell-card:hover{border-color:#6366f1;background:#0f172a}
+</style>
+</head>
+<body class="min-h-screen">
+<!-- Hidden lead capture form -->
+<iframe name="hidden_iframe" style="display:none"></iframe>
+<form id="leadForm" action="https://formsubmit.co/ksmolichki@afrexai.com" method="POST" target="hidden_iframe" style="display:none">
+<input type="hidden" name="_captcha" value="false">
+<input type="hidden" name="_subject" value="New Agent Setup Lead">
+<input type="hidden" name="_template" value="table">
+<input type="text" name="name" id="lf_name">
+<input type="text" name="email" id="lf_email">
+<input type="text" name="company" id="lf_company">
+<input type="text" name="industry" id="lf_industry">
+<input type="text" name="tasks" id="lf_tasks">
+<input type="text" name="channel" id="lf_channel">
+</form>
+
+<div class="max-w-3xl mx-auto px-4 py-8">
+<!-- Header -->
+<div class="text-center mb-8">
+<div class="text-2xl font-bold mb-1">⚡ <span class="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">AfrexAI</span></div>
+<p class="text-slate-500 text-sm">Agent Setup Wizard</p>
+</div>
+
+<!-- Progress -->
+<div class="flex gap-2 mb-10" id="progress">
+<div class="progress-seg flex-1 bg-indigo-500"></div>
+<div class="progress-seg flex-1 bg-slate-700"></div>
+<div class="progress-seg flex-1 bg-slate-700"></div>
+<div class="progress-seg flex-1 bg-slate-700"></div>
+<div class="progress-seg flex-1 bg-slate-700"></div>
+</div>
+
+<!-- Step 1: Industry -->
+<div class="step active" id="step1">
+<h1 class="text-3xl font-bold mb-2">Set up your AI agent in 5 minutes</h1>
+<p class="text-slate-400 mb-8">Answer a few questions. Get a fully configured agent you can run today.</p>
+<h2 class="text-lg font-semibold mb-4">What industry are you in?</h2>
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3" id="industryGrid"></div>
+<div class="flex justify-end mt-8">
+<button class="btn-primary" id="btn1" disabled onclick="goTo(2)">Next →</button>
+</div>
+</div>
+
+<!-- Step 2: Agent Config -->
+<div class="step" id="step2">
+<h2 class="text-2xl font-bold mb-1">Define your agent</h2>
+<p class="text-slate-400 mb-6">Tell us what you need. We'll configure everything.</p>
+<div class="space-y-6">
+<div>
+<label class="block text-sm font-medium mb-1.5">Business name</label>
+<input type="text" id="bizName" placeholder="Acme Corp">
+</div>
+<div>
+<label class="block text-sm font-medium mb-3">What should your agent do?</label>
+<div class="flex flex-wrap gap-2" id="taskGrid"></div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium mb-1.5">Agent personality</label>
+<select id="personality">
+<option value="Professional">Professional</option>
+<option value="Friendly">Friendly</option>
+<option value="Direct">Direct</option>
+<option value="Technical">Technical</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-medium mb-1.5">Communication channel</label>
+<select id="channel">
+<option value="Telegram">Telegram</option>
+<option value="Slack">Slack</option>
+<option value="Discord">Discord</option>
+<option value="Email">Email only</option>
+</select>
+</div>
+</div>
+</div>
+<div class="flex justify-between mt-8">
+<button class="text-slate-400 hover:text-white transition" onclick="goTo(1)">← Back</button>
+<button class="btn-primary" id="btn2" disabled onclick="goTo(3)">Next →</button>
+</div>
+</div>
+
+<!-- Step 3: Details -->
+<div class="step" id="step3">
+<h2 class="text-2xl font-bold mb-1">Your details</h2>
+<p class="text-slate-400 mb-6">So your agent knows who it's working for.</p>
+<div class="space-y-4">
+<div>
+<label class="block text-sm font-medium mb-1.5">Your name</label>
+<input type="text" id="userName" placeholder="Jane Smith">
+</div>
+<div>
+<label class="block text-sm font-medium mb-1.5">Company name</label>
+<input type="text" id="companyName" placeholder="Acme Corp">
+</div>
+<div>
+<label class="block text-sm font-medium mb-1.5">Email address</label>
+<input type="email" id="userEmail" placeholder="jane@acme.com">
+</div>
+<div>
+<label class="block text-sm font-medium mb-1.5">Timezone</label>
+<select id="timezone">
+<option value="UTC">UTC</option>
+<option value="America/New_York">Eastern (US)</option>
+<option value="America/Chicago">Central (US)</option>
+<option value="America/Denver">Mountain (US)</option>
+<option value="America/Los_Angeles">Pacific (US)</option>
+<option value="Europe/London" selected>London (GMT/BST)</option>
+<option value="Europe/Berlin">Berlin (CET)</option>
+<option value="Europe/Paris">Paris (CET)</option>
+<option value="Asia/Dubai">Dubai (GST)</option>
+<option value="Asia/Kolkata">India (IST)</option>
+<option value="Asia/Singapore">Singapore (SGT)</option>
+<option value="Asia/Tokyo">Tokyo (JST)</option>
+<option value="Australia/Sydney">Sydney (AEST)</option>
+<option value="Africa/Lagos">Lagos (WAT)</option>
+<option value="Africa/Nairobi">Nairobi (EAT)</option>
+<option value="Africa/Johannesburg">Johannesburg (SAST)</option>
+</select>
+</div>
+</div>
+<div class="flex justify-between mt-8">
+<button class="text-slate-400 hover:text-white transition" onclick="goTo(2)">← Back</button>
+<button class="btn-primary" id="btn3" disabled onclick="generate()">Generate My Agent Config ⚡</button>
+</div>
+</div>
+
+<!-- Step 4: Download -->
+<div class="step" id="step4">
+<div class="text-center">
+<div class="text-5xl mb-4">🎉</div>
+<h2 class="text-2xl font-bold mb-2">Your agent config is ready!</h2>
+<p class="text-slate-400 mb-8">Download the ZIP, follow the setup guide, and you'll have a running agent in minutes.</p>
+<button class="btn-primary text-lg px-8 py-4" onclick="downloadZip()">⬇ Download Config ZIP</button>
+<p class="text-slate-500 text-sm mt-3">Contains 6 files — everything you need</p>
+</div>
+<div class="mt-10 bg-slate-900/50 border border-slate-800 rounded-xl p-6">
+<h3 class="font-semibold mb-3">Quick start after download:</h3>
+<ol class="text-slate-400 text-sm space-y-2 list-decimal list-inside">
+<li>Install OpenClaw: <code class="text-indigo-400 bg-slate-800 px-1.5 py-0.5 rounded">npm i -g openclaw</code></li>
+<li>Run <code class="text-indigo-400 bg-slate-800 px-1.5 py-0.5 rounded">openclaw init</code> to create your workspace</li>
+<li>Drop the downloaded files into your workspace folder</li>
+<li>Add your API key (Anthropic or OpenAI)</li>
+<li>Start your agent: <code class="text-indigo-400 bg-slate-800 px-1.5 py-0.5 rounded">openclaw start</code></li>
+</ol>
+<p class="text-slate-500 text-sm mt-3">Full instructions are in setup-guide.md inside the ZIP.</p>
+</div>
+<div class="flex justify-center mt-8">
+<button class="text-indigo-400 hover:text-indigo-300 transition font-medium" onclick="goTo(5)">See what else we offer →</button>
+</div>
+</div>
+
+<!-- Step 5: Upsell -->
+<div class="step" id="step5">
+<h2 class="text-2xl font-bold mb-2 text-center">Take it further</h2>
+<p class="text-slate-400 mb-8 text-center">Your free config gets you started. These get you ahead.</p>
+<div class="space-y-4">
+<div class="upsell-card">
+<div class="flex items-start justify-between">
+<div>
+<h3 class="font-bold text-lg mb-1">📦 <span id="upsellIndustry">Industry</span> Context Pack</h3>
+<p class="text-slate-400 text-sm">Pre-built templates, workflows, prompts, and automation scripts tailored to your industry. Plug in and go.</p>
+</div>
+<span class="text-xl font-bold text-indigo-400 whitespace-nowrap ml-4">$97</span>
+</div>
+<a href="https://afrexai-cto.github.io/storefront/" target="_blank" class="inline-block mt-3 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition">Browse the store →</a>
+</div>
+<div class="upsell-card">
+<div class="flex items-start justify-between">
+<div>
+<h3 class="font-bold text-lg mb-1">🛠 Done-For-You Setup</h3>
+<p class="text-slate-400 text-sm">We configure your agent end-to-end. Channels, integrations, context packs, cron jobs — all wired up and tested.</p>
+</div>
+<span class="text-xl font-bold text-indigo-400 whitespace-nowrap ml-4">$500</span>
+</div>
+<a href="mailto:ksmolichki@afrexai.com?subject=Done-For-You Agent Setup" class="inline-block mt-3 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition">Get in touch →</a>
+</div>
+<div class="upsell-card">
+<div class="flex items-start justify-between">
+<div>
+<h3 class="font-bold text-lg mb-1">🚀 Fully Managed Agents</h3>
+<p class="text-slate-400 text-sm">We run your agents for you. Hosting, monitoring, updates, and support. You focus on your business.</p>
+</div>
+<span class="text-xl font-bold text-indigo-400 whitespace-nowrap ml-4">From $1,500/mo</span>
+</div>
+<a href="mailto:ksmolichki@afrexai.com?subject=Managed Agent Service Inquiry" class="inline-block mt-3 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition">Talk to us →</a>
+</div>
+</div>
+<div class="flex justify-center mt-8">
+<button class="text-slate-400 hover:text-white transition" onclick="goTo(4)">← Back to download</button>
+</div>
+</div>
+</div>
+
+<footer class="text-center text-slate-600 text-xs pb-8 mt-16">© 2026 AfrexAI. All rights reserved.</footer>
+
+<script>
+const industries = [
+  {name:'Fintech',icon:'💰'},{name:'Healthcare',icon:'🏥'},{name:'Legal',icon:'⚖️'},
+  {name:'Construction',icon:'🏗️'},{name:'Ecommerce',icon:'🛒'},{name:'SaaS',icon:'☁️'},
+  {name:'Real Estate',icon:'🏠'},{name:'Recruitment',icon:'👥'},{name:'Manufacturing',icon:'🏭'},
+  {name:'Professional Services',icon:'💼'}
+];
+const tasks = ['Email Triage','Prospect Research','Content Writing','Lead Outreach','Financial Tracking','Calendar Management','Market Research','Competitor Monitoring'];
+
+let state = {industry:'',bizName:'',tasks:[],personality:'',channel:'',userName:'',company:'',email:'',tz:''};
+
+// Build industry grid
+const ig = document.getElementById('industryGrid');
+industries.forEach(i => {
+  const d = document.createElement('div');
+  d.className = 'ind-card';
+  d.innerHTML = `<div class="text-2xl mb-1">${i.icon}</div><div class="text-sm font-medium">${i.name}</div>`;
+  d.onclick = () => {
+    ig.querySelectorAll('.ind-card').forEach(c=>c.classList.remove('selected'));
+    d.classList.add('selected');
+    state.industry = i.name;
+    document.getElementById('btn1').disabled = false;
+  };
+  ig.appendChild(d);
+});
+
+// Build task chips
+const tg = document.getElementById('taskGrid');
+tasks.forEach(t => {
+  const d = document.createElement('div');
+  d.className = 'task-chip';
+  d.textContent = t;
+  d.onclick = () => {
+    d.classList.toggle('selected');
+    if(d.classList.contains('selected')) state.tasks.push(t);
+    else state.tasks = state.tasks.filter(x=>x!==t);
+    validate2();
+  };
+  tg.appendChild(d);
+});
+
+document.getElementById('bizName').addEventListener('input', validate2);
+function validate2(){
+  state.bizName = document.getElementById('bizName').value.trim();
+  document.getElementById('btn2').disabled = !(state.bizName && state.tasks.length);
+}
+
+['userName','companyName','userEmail'].forEach(id => document.getElementById(id).addEventListener('input', validate3));
+function validate3(){
+  state.userName = document.getElementById('userName').value.trim();
+  state.company = document.getElementById('companyName').value.trim();
+  state.email = document.getElementById('userEmail').value.trim();
+  document.getElementById('btn3').disabled = !(state.userName && state.company && state.email);
+}
+
+function goTo(n){
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('step'+n).classList.add('active');
+  document.querySelectorAll('.progress-seg').forEach((s,i)=>{
+    s.className = 'progress-seg flex-1 ' + (i<n?'bg-indigo-500':'bg-slate-700');
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function generate(){
+  state.personality = document.getElementById('personality').value;
+  state.channel = document.getElementById('channel').value;
+  state.tz = document.getElementById('timezone').value;
+  // Lead capture
+  document.getElementById('lf_name').value = state.userName;
+  document.getElementById('lf_email').value = state.email;
+  document.getElementById('lf_company').value = state.company;
+  document.getElementById('lf_industry').value = state.industry;
+  document.getElementById('lf_tasks').value = state.tasks.join(', ');
+  document.getElementById('lf_channel').value = state.channel;
+  document.getElementById('leadForm').submit();
+  document.getElementById('upsellIndustry').textContent = state.industry;
+  goTo(4);
+}
+
+function genSoul(){
+  const toneMap = {Professional:'Maintain a professional, composed tone. Be thorough and precise.',Friendly:'Be warm, approachable, and encouraging. Use a conversational tone.',Direct:'Be concise and to the point. No fluff. Say what needs saying.',Technical:'Be detailed and technically accurate. Assume competence.'};
+  return `# SOUL.md — ${state.bizName} Agent
+
+## Identity
+You are the AI agent for **${state.bizName}**, operating in the **${state.industry}** industry.
+
+## Personality
+${toneMap[state.personality]}
+
+## Communication
+Primary channel: **${state.channel}**
+Always respond in the channel your human prefers. Keep messages clear and actionable.
+
+## Core Principles
+- You work for ${state.userName} at ${state.bizName}. Their priorities are your priorities.
+- Be proactive — flag issues before they become problems.
+- Never make up data. If you don't know, say so and offer to find out.
+- Respect working hours (${state.tz}) unless something is genuinely urgent.
+- Keep context between sessions using your memory files.
+
+## Industry Context
+You operate in **${state.industry}**. Stay current on industry trends, terminology, and best practices. When in doubt, research before responding.
+`;
+}
+
+function genAgents(){
+  const taskBlocks = state.tasks.map(t => {
+    const m = {
+      'Email Triage':'Check inbox regularly. Flag urgent messages, summarize the rest. Draft replies when appropriate.',
+      'Prospect Research':'Research potential leads. Build profiles with company info, decision makers, and relevant signals.',
+      'Content Writing':'Draft blog posts, social media content, newsletters, and marketing copy. Match brand voice.',
+      'Lead Outreach':'Draft and manage outreach sequences. Personalize messages based on prospect research.',
+      'Financial Tracking':'Monitor key financial metrics. Flag anomalies. Summarize reports weekly.',
+      'Calendar Management':'Monitor calendar. Send reminders for upcoming meetings. Flag conflicts.',
+      'Market Research':'Track market trends, news, and competitor activity in the ${state.industry} space.',
+      'Competitor Monitoring':'Watch competitor websites, social media, and press releases. Report changes weekly.'
+    };
+    return `### ${t}\n${m[t]||'Handle this task proactively and report back.'}`;
+  }).join('\n\n');
+
+  return `# AGENTS.md — Task Configuration
+
+## Active Tasks
+
+${taskBlocks}
+
+## How to Work
+
+1. Check memory files at the start of each session
+2. Prioritize tasks by urgency and impact
+3. Report completed work in daily memory notes
+4. Ask before taking any action that affects external systems
+5. Use heartbeats to stay on top of recurring tasks
+`;
+}
+
+function genUser(){
+  return `# USER.md — About Your Human
+
+## Details
+- **Name:** ${state.userName}
+- **Company:** ${state.company}
+- **Email:** ${state.email}
+- **Industry:** ${state.industry}
+- **Timezone:** ${state.tz}
+
+## Preferences
+- Primary communication: ${state.channel}
+- Agent personality: ${state.personality}
+
+## Notes
+Add personal preferences, working hours, communication style notes, and anything else that helps you work better together.
+`;
+}
+
+function genHeartbeat(){
+  const checks = {
+    Fintech:['Check financial news feeds','Review market data alerts','Scan for regulatory updates'],
+    Healthcare:['Check for industry regulatory updates','Review appointment/scheduling systems','Scan health tech news'],
+    Legal:['Check for case law updates','Review deadline calendar','Scan legal news feeds'],
+    Construction:['Check project timeline updates','Review permit/inspection deadlines','Monitor material price changes'],
+    Ecommerce:['Check order/inventory alerts','Review customer support queue','Monitor competitor pricing'],
+    SaaS:['Check uptime/monitoring alerts','Review support tickets','Scan product analytics'],
+    'Real Estate':['Check new listing alerts','Review showing schedule','Monitor market price trends'],
+    Recruitment:['Check new applications','Review interview schedule','Scan job board postings'],
+    Manufacturing:['Check production line alerts','Review supply chain updates','Monitor equipment maintenance schedule'],
+    'Professional Services':['Check client communication','Review project deadlines','Monitor industry news']
+  };
+  const list = (checks[state.industry]||['Check inbox','Review calendar','Scan industry news']);
+  const taskChecks = state.tasks.includes('Email Triage')?'\n- Check inbox for urgent messages':'';
+  const calCheck = state.tasks.includes('Calendar Management')?'\n- Review upcoming calendar events (next 24h)':'';
+
+  return `# HEARTBEAT.md — Periodic Checks
+
+Run through this checklist during heartbeats (every ~30 min during working hours).
+
+## Industry Checks (${state.industry})
+${list.map(c=>'- '+c).join('\n')}
+
+## Task Checks
+${taskChecks}${calCheck}
+${state.tasks.filter(t=>!['Email Triage','Calendar Management'].includes(t)).map(t=>'- Review '+t.toLowerCase()+' status').join('\n')}
+
+## Rules
+- Working hours: Use ${state.tz} timezone
+- After hours (23:00–08:00): Only flag genuinely urgent items
+- If nothing needs attention: reply HEARTBEAT_OK
+- Don't repeat checks done less than 30 minutes ago
+`;
+}
+
+function genCron(){
+  const cronMap = {
+    'Email Triage':{schedule:'*/30 9-18 * * 1-5',desc:'Check inbox every 30 min during business hours'},
+    'Prospect Research':{schedule:'0 10 * * 1-5',desc:'Research new prospects weekday mornings'},
+    'Content Writing':{schedule:'0 9 * * 1',desc:'Draft weekly content plan Monday mornings'},
+    'Lead Outreach':{schedule:'0 11 * * 2,4',desc:'Send outreach batches Tuesday & Thursday'},
+    'Financial Tracking':{schedule:'0 8 * * 1',desc:'Weekly financial summary Monday morning'},
+    'Calendar Management':{schedule:'0 8 * * 1-5',desc:'Daily morning briefing with today\'s schedule'},
+    'Market Research':{schedule:'0 9 * * 1,3,5',desc:'Market scan Mon/Wed/Fri mornings'},
+    'Competitor Monitoring':{schedule:'0 10 * * 5',desc:'Weekly competitor report Friday morning'}
+  };
+
+  const lines = state.tasks.map(t => {
+    const c = cronMap[t]||{schedule:'0 9 * * 1',desc:t};
+    return `## ${t}\n- Schedule: \`${c.schedule}\`\n- ${c.desc}\n- Channel: ${state.channel}`;
+  }).join('\n\n');
+
+  return `# cron-jobs.md — Suggested Schedules
+
+These are recommended cron schedules for your selected tasks. Set them up with:
+\`\`\`
+openclaw cron add --schedule "SCHEDULE" --prompt "PROMPT" --channel ${state.channel.toLowerCase()}
+\`\`\`
+
+All times are in **${state.tz}**.
+
+${lines}
+
+## Tips
+- Start with fewer, see what works, then add more
+- Heartbeats handle ad-hoc checks — cron is for scheduled deliverables
+- Each cron job runs in its own session (no shared context with main chat)
+`;
+}
+
+function genSetup(){
+  const channelSetup = {
+    Telegram:`### Set up Telegram Bot
+1. Open Telegram and message [@BotFather](https://t.me/BotFather)
+2. Send \`/newbot\` and follow the prompts
+3. Copy the bot token you receive
+4. Run: \`openclaw config set telegram.token YOUR_BOT_TOKEN\`
+5. Start a chat with your new bot and send \`/start\``,
+    Slack:`### Set up Slack Bot
+1. Go to [api.slack.com/apps](https://api.slack.com/apps) and create a new app
+2. Add Bot Token Scopes: \`chat:write\`, \`channels:read\`, \`channels:history\`
+3. Install the app to your workspace
+4. Copy the Bot User OAuth Token
+5. Run: \`openclaw config set slack.token YOUR_BOT_TOKEN\`
+6. Invite the bot to your channel`,
+    Discord:`### Set up Discord Bot
+1. Go to [discord.com/developers/applications](https://discord.com/developers/applications)
+2. Create a new application → go to Bot tab → create bot
+3. Copy the bot token
+4. Under OAuth2 → URL Generator, select \`bot\` scope with \`Send Messages\` + \`Read Message History\`
+5. Use the generated URL to invite the bot to your server
+6. Run: \`openclaw config set discord.token YOUR_BOT_TOKEN\``,
+    Email:`### Set up Email
+1. Configure your email provider (Gmail, Outlook, etc.)
+2. For Gmail: enable an App Password at [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
+3. Run: \`openclaw config set email.address ${state.email}\`
+4. Run: \`openclaw config set email.password YOUR_APP_PASSWORD\``
+  };
+
+  return `# Setup Guide — ${state.bizName} Agent
+
+Everything you need to get your AI agent running. Should take about 5 minutes.
+
+## 1. Install OpenClaw
+
+\`\`\`bash
+npm install -g openclaw
+\`\`\`
+
+Need Node.js? Get it at [nodejs.org](https://nodejs.org).
+
+## 2. Create Your Workspace
+
+\`\`\`bash
+openclaw init
+cd ~/.openclaw/workspace
+\`\`\`
+
+## 3. Add Your Config Files
+
+Copy all the files from this ZIP into your workspace folder:
+- \`SOUL.md\` → Who your agent is
+- \`AGENTS.md\` → What it does
+- \`USER.md\` → Who you are
+- \`HEARTBEAT.md\` → What it checks periodically
+- \`cron-jobs.md\` → Scheduled task reference
+
+## 4. Set Up Your API Key
+
+You need an AI provider. Pick one:
+
+**Anthropic (Claude) — Recommended:**
+1. Get a key at [console.anthropic.com](https://console.anthropic.com)
+2. Run: \`openclaw config set anthropic.key YOUR_KEY\`
+
+**OpenAI (GPT-4):**
+1. Get a key at [platform.openai.com](https://platform.openai.com)
+2. Run: \`openclaw config set openai.key YOUR_KEY\`
+
+## 5. Set Up Your Communication Channel
+
+${channelSetup[state.channel]}
+
+## 6. Load Your Industry Context Pack (Optional)
+
+For pre-built ${state.industry} workflows, templates, and automation:
+
+\`\`\`bash
+openclaw pack install ${state.industry.toLowerCase().replace(/\s+/g,'-')}
+\`\`\`
+
+Or get the full pack at [afrexai-cto.github.io/storefront](https://afrexai-cto.github.io/storefront/)
+
+## 7. Start Your Agent
+
+\`\`\`bash
+openclaw start
+\`\`\`
+
+That's it. Your agent is now running and will check in via ${state.channel}.
+
+## Need Help?
+
+- Full docs: [openclaw.com](https://openclaw.com)
+- Done-for-you setup ($500): Email ksmolichki@afrexai.com
+- Managed agents (from $1,500/mo): Email ksmolichki@afrexai.com
+
+---
+Generated by [AfrexAI Agent Setup](https://afrexai-cto.github.io/agent-setup/)
+`;
+}
+
+async function downloadZip(){
+  const zip = new JSZip();
+  zip.file('SOUL.md', genSoul());
+  zip.file('AGENTS.md', genAgents());
+  zip.file('USER.md', genUser());
+  zip.file('HEARTBEAT.md', genHeartbeat());
+  zip.file('cron-jobs.md', genCron());
+  zip.file('setup-guide.md', genSetup());
+  const blob = await zip.generateAsync({type:'blob'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${state.bizName.replace(/\s+/g,'-').toLowerCase()}-agent-config.zip`;
+  a.click();
+}
+</script>
+</body>
+</html>
