@@ -30,9 +30,10 @@ input:focus,select:focus{outline:none;border-color:#6366f1}
 <!-- Hidden lead capture form -->
 <iframe name="hidden_iframe" style="display:none"></iframe>
 <form id="leadForm" action="https://formsubmit.co/info@afrexai.com" method="POST" target="hidden_iframe" style="display:none">
-<input type="hidden" name="_captcha" value="false">
+<input type="hidden" name="_captcha" value="true">
 <input type="hidden" name="_subject" value="New Agent Setup Lead">
 <input type="hidden" name="_template" value="table">
+<input type="text" name="_honey" style="display:none">
 <input type="text" name="name" id="lf_name">
 <input type="text" name="email" id="lf_email">
 <input type="text" name="company" id="lf_company">
@@ -207,11 +208,17 @@ input:focus,select:focus{outline:none;border-color:#6366f1}
 <div class="flex items-start justify-between">
 <div>
 <h3 class="font-bold text-lg mb-1">🚀 We Run Everything For You</h3>
-<p class="text-slate-400 text-sm">Don't want to manage any of this? We host your agents on our servers, keep them running 24/7, handle all updates, and make sure everything works. You focus on your business, we handle the tech. It's like having an AI team on staff without the overhead.</p>
+<p class="text-slate-400 text-sm">Don't want to manage any of this? We host your agents on our servers, keep them running 24/7, handle all updates, and make sure everything works. You focus on your business, we handle the tech.</p>
 </div>
-<span class="text-xl font-bold text-indigo-400 whitespace-nowrap ml-4">From $1,500/mo</span>
+<div class="ml-4 text-right whitespace-nowrap">
+<span class="text-xl font-bold text-yellow-400">$3,500/mo</span>
+<span class="text-slate-500 text-xs block line-through">$5,500/mo</span>
+<span class="text-yellow-400 text-xs block">Launch offer — first month discount</span>
 </div>
-<a href="https://calendly.com/cbeckford-afrexai/30min" target="_blank" class="inline-block mt-3 text-sm font-medium text-indigo-400 hover:text-indigo-300 transition">Book a free call →</a>
+</div>
+<div class="flex flex-wrap gap-3 mt-3">
+<a href="https://buy.stripe.com/14A6oAe1EaQv1jeaxh0sU0f" target="_blank" class="inline-block text-sm font-medium bg-yellow-500 text-black px-4 py-2 rounded-lg hover:bg-yellow-400 transition">Start now — $3,500/mo →</a>
+<a href="https://calendly.com/cbeckford-afrexai/30min" target="_blank" class="inline-block text-sm font-medium text-indigo-400 hover:text-indigo-300 transition px-4 py-2">Book a free call first →</a>
 </div>
 </div>
 <p class="text-slate-500 text-xs text-center mt-6">Not sure which option is right for you? Book a free 30-minute call and we'll walk you through it — no pressure, no commitment.</p>
@@ -270,12 +277,38 @@ function validate2(){
   document.getElementById('btn2').disabled = !(state.bizName && state.tasks.length);
 }
 
+const freeEmailDomains = ['gmail.com','yahoo.com','hotmail.com','outlook.com','aol.com','icloud.com','mail.com','protonmail.com','zoho.com','yandex.com','gmx.com','live.com','msn.com','inbox.com','me.com','qq.com','163.com','126.com','yeah.net','tutanota.com','fastmail.com','hushmail.com','mailfence.com'];
+
+function isBusinessEmail(email){
+  if(!email.includes('@')) return false;
+  const domain = email.split('@')[1].toLowerCase();
+  return !freeEmailDomains.includes(domain);
+}
+
+function isValidEmail(email){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
 ['userName','companyName','userEmail'].forEach(id => document.getElementById(id).addEventListener('input', validate3));
+
+const emailHint = document.createElement('p');
+emailHint.className = 'text-xs mt-1 text-yellow-400';
+emailHint.style.display = 'none';
+emailHint.textContent = 'Please use your business email address (not Gmail, Yahoo, etc.)';
+document.getElementById('userEmail').parentNode.appendChild(emailHint);
+
 function validate3(){
   state.userName = document.getElementById('userName').value.trim();
   state.company = document.getElementById('companyName').value.trim();
   state.email = document.getElementById('userEmail').value.trim();
-  document.getElementById('btn3').disabled = !(state.userName && state.company && state.email);
+  const emailValid = isValidEmail(state.email) && isBusinessEmail(state.email);
+  const emailTyped = state.email.length > 0 && state.email.includes('@');
+  emailHint.style.display = (emailTyped && !isBusinessEmail(state.email)) ? 'block' : 'none';
+  // Name must be at least 2 words, min 3 chars
+  const nameValid = state.userName.length >= 3 && state.userName.includes(' ');
+  // Company must be at least 2 chars
+  const companyValid = state.company.length >= 2;
+  document.getElementById('btn3').disabled = !(nameValid && companyValid && emailValid);
 }
 
 function goTo(n){
@@ -545,7 +578,7 @@ That's it. Your agent is now running and will check in via ${state.channel}.
 
 - Full docs: [openclaw.com](https://openclaw.com)
 - Done-for-you setup ($500): Email info@afrexai.com
-- Managed agents (from $1,500/mo): Email info@afrexai.com
+- Managed agents (from $5,500/mo): Email info@afrexai.com
 
 ---
 Generated by [AfrexAI Agent Setup](https://afrexai-cto.github.io/agent-setup/)
